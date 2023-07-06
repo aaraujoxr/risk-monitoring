@@ -1,5 +1,3 @@
-key_path = os.path.expanduser("~/Repositories/Keys/risk-monitoring-361911-b36f261aaf32.json")
-
 def get_gbq_data(key_path=key_path):
     import os
     import numpy as np
@@ -135,4 +133,4 @@ def get_gbq_data(key_path=key_path):
 
     results = query_job.result().to_dataframe()
     timestamp = datetime.now().strftime("%Y%m%d-%H%M")
-    results.to_csv(f"monitoring-data/raw-{timestamp}.csv")
+    results.to_csv(f"monitoring-data/positions-{timestamp}.csv")

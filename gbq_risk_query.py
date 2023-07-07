@@ -1,4 +1,4 @@
-def get_gbq_data(key_path=key_path):
+def get_gbq_data():
     import os
     import numpy as np
     import pandas as pd
@@ -8,7 +8,7 @@ def get_gbq_data(key_path=key_path):
     from google.cloud import bigquery
     from google.oauth2 import service_account
 
-    
+    key_path = os.path.expanduser("~/Repositories/Keys/gbq-risk-monitoring-361911-credentials.json")
     credentials = service_account.Credentials.from_service_account_file(key_path)
     project_id = "risk-monitoring-361911"
 
@@ -132,5 +132,6 @@ def get_gbq_data(key_path=key_path):
     order by chainId, vammAddress, unrealizedPnl desc""")
 
     results = query_job.result().to_dataframe()
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M")
-    results.to_csv(f"monitoring-data/positions-{timestamp}.csv")
+    timestampstr = datetime.now().strftime("%Y%m%d-%H%M")
+    results.to_csv(f"monitoring-data/positions-{timestampstr}.csv")
+    return timestampstr

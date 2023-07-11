@@ -1,7 +1,6 @@
 import gbq_risk_query
-from definitions import key_path
 
-timestampstr = gbq_risk_query.get_gbq_data(key_path=key_path)
+timestampstr = gbq_risk_query.get_gbq_data()
 
 import solvency_statistics
 

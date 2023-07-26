@@ -33,11 +33,11 @@ class RiskMonitoringGBQ(GBQProjectWithKey):
                              owner=None, tick_lower=None, tick_upper=None):
         
         query_str = self.query_str
-        if latest:
+        if start_datetime_str and end_datetime_str:
+            query_str += f""" AND timestamp > UNIX_SECONDS(TIMESTAMP("{start_datetime_str}"))
+                            AND timestamp < UNIX_SECONDS(TIMESTAMP("{end_datetime_str}"))"""
+        elif latest:
             query_str += f" AND is_latest_block = true"
-        elif start_datetime_str and end_datetime_str:
-            query_str = f"""\n AND timestamp > UNIX_SECONDS(TIMESTAMP('{start_datetime_str}'))
-                            AND timestamp < UNIX_SECONDS(TIMESTAMP('{end_datetime_str}'))"""
 
         if chain_id:
             query_str += f" AND chain_id = '{chain_id}'"

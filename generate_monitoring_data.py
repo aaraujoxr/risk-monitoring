@@ -15,7 +15,8 @@ timestampstr = datetime.now().strftime("%Y%m%d-%H%M")
 pnl_results = project.generic_query(pnl_query_string)
 pnl_results.to_csv(f"monitoring-data/positions-{timestampstr}.csv")
 
-mr_results = project.generic_query(pnl_query_string)
+project = gbq_tools.RiskMonitoringGBQ(version="mr")
+mr_results = project.get_position_history(latest=True)
 mr_results.to_csv(f"monitoring-data/positions-mr-{timestampstr}.csv")
 
 solvency_statistics.compute_summary_negative_statistics(timestampstr)

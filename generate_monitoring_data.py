@@ -19,13 +19,16 @@ def generate_monitoring_data(path_to_save):
 
     full_mr_table = monitoring_functions.complete_mr_table(mr_results, pool_specs_df)
     full_mr_table.to_csv(path_to_save + f"full-mr-{timestampstr}.csv")
+    monitoring_functions.compute_summary_statistics(timestampstr,
+                                                    pool_specs=pool_specs_df,
+                                                    path_to_save=path_to_save)
+    
+    import solvency_statistics
+    from sqlQueries.pnlQuery import pnl_query_string
 
     project_id = "risk-monitoring-361911"
     key_path = os.path.expanduser("~/Repositories/Keys/gbq-risk-monitoring-361911-credentials.json")
     project = gbq_tools.GBQProjectWithKey(project_id=project_id, key_path=key_path)
-    
-    import solvency_statistics
-    from sqlQueries.pnlQuery import pnl_query_string
 
     pnl_results = project.generic_query(pnl_query_string)
     pnl_results.to_csv(path_to_save + f"positions-{timestampstr}.csv")

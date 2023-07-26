@@ -1,5 +1,6 @@
 def compute_summary_negative_statistics(identifier, path_to_save):
     import pandas as pd
+    pool_specs = pd.read_csv("pool-specs.csv")
     from definitions import vamm_addresses
 
     positions_df = pd.read_csv(path_to_save + f"positions-{identifier}.csv")
@@ -13,35 +14,38 @@ def compute_summary_negative_statistics(identifier, path_to_save):
     positions_df["Final balance"] = positions_df["Real balance"]+positions_df["uPnL"]
     positions_df["Leverage"] = positions_df["variableTokenBalance"]/positions_df["Final balance"]
 
-    positions = {chain:
-             {pool: positions_df[positions_df["vammAddress"]==vamm_addresses[chain][pool]]
-              for pool in vamm_addresses[chain]
-             }
-             for chain in vamm_addresses.keys()
-            }
-    
-    multiindex = []
-    for chain in vamm_addresses.keys():
-        for pool in vamm_addresses[chain].keys():
-            multiindex.append((chain, pool))
+    pools_dic = {}
 
-    multiindex = pd.MultiIndex.from_tuples(multiindex)
-
-    summary_df = pd.DataFrame(index=multiindex,
-                            columns=["Total margin deposited", "Number positions", "No. overdrafts", "Total overdrafts",
-                                    "No. pos. on default", "Shortfall"])
+    for item in positions_df.groupby(["chainId","vammAddress"]):
+        try:
+            ticker = pool_specs["ticker"][(pool_specs["chain_id"]==item[0][0])&
+                                (pool_specs["vAMM_address"]==item[0][1])].values[0]
+        except:
+            ticker = item[0]
+        pools_dic[ticker] = item[1]
     
+    summary_df = pd.DataFrame(index=pools_dic.keys(),
+                              columns=["Total margin deposited",
+                                       "Number positions",
+                                       "No. overdrafts",
+                                       "Total overdrafts",
+                                       "No. pos. on default",
+                                       "Shortfall"
+                                      ])
+
     insolvent_positions = {}
     defaulted_positions = {}
 
     for pool in summary_df.index:
-        dataset = positions[pool[0]][pool[1]]#[["Initial balance", "rPnL", "Balance after rPnL sttlm", "uPnL", "Final balance", "Leverage"]]
-                                    
-        summary_df.loc[pool] = [dataset["Initial balance"].sum(),len(dataset), (dataset["Real balance"]<0).sum(),
-                            (dataset["Real balance"][dataset["Real balance"]<0]).sum(),
-                            (dataset["Final balance"]<0).sum(),
-                            (dataset["Final balance"][dataset["Final balance"]<0]).sum()
-                            ]
+        dataset = pools_dic[pool]
+          
+        summary_df.loc[pool] = [dataset["Initial balance"].sum(),
+                                len(dataset),
+                                (dataset["Real balance"]<0).sum(),
+                                (dataset["Real balance"][dataset["Real balance"]<0]).sum(),
+                                (dataset["Final balance"]<0).sum(),
+                                (dataset["Final balance"][dataset["Final balance"]<0]).sum()
+                               ]
         insolvent_positions[pool] = dataset[dataset["Real balance"]<0]
 
         defaulted_positions[pool] = dataset[dataset["Final balance"]<0]

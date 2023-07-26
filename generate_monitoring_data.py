@@ -19,7 +19,7 @@ pool_specs_df = pd.read_csv("pool-specs.csv", index_col=0)
 pool_specs_df["maturity_date"] = pool_specs_df["maturity_date"].apply(lambda x: datetime.strptime(x,"%m-%d-%Y %H:%M:%S"))
 pool_specs_df["inception_date"] = pool_specs_df["inception_date"].apply(lambda x: datetime.strptime(x,"%m-%d-%Y %H:%M:%S"))
 
-full_mr_table = monitoring_functions.complete_mr_table(timestampstr, pool_specs_df)
+full_mr_table = monitoring_functions.complete_mr_table(mr_results, pool_specs_df)
 full_mr_table.to_csv(f"monitoring-data/full-mr-{timestampstr}.csv")
 
 project_id = "risk-monitoring-361911"

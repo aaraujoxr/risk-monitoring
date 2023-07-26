@@ -40,13 +40,13 @@ class RiskMonitoringGBQ(GBQProjectWithKey):
             query_str += f" AND is_latest_block = true"
 
         if chain_id:
-            query_str += f" AND chain_id = '{chain_id}'"
+            query_str += f" AND chain_id = {chain_id}"
         if margin_engine:
             query_str += f" AND margin_engine = '{margin_engine}'"
         if owner:
             query_str += f" AND owner = '{owner}'"
         if tick_lower:
-            query_str += f" AND tick_lower = '{tick_lower}'"
+            query_str += f" AND tick_lower = {tick_lower}"
         if tick_upper:
-            query_str += f" AND tick_upper = '{tick_upper}'"
+            query_str += f" AND tick_upper = {tick_upper}"
         return self.generic_query(query_str)

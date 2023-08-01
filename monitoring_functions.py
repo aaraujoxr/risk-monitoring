@@ -25,8 +25,7 @@ def complete_mr_table(positions_mr_df,pool_specs_df):
 
 def compute_summary_statistics(identifier, pool_specs,path_to_save):
     import pandas as pd
-    from definitions import vamm_addresses
-
+    
     positions_df = pd.read_csv(path_to_save + f"full-mr-{identifier}.csv")
 
     pools_dic = {}

@@ -1,7 +1,6 @@
 def compute_summary_negative_statistics(identifier, path_to_save):
     import pandas as pd
     pool_specs = pd.read_csv("pool-specs.csv")
-    from definitions import vamm_addresses
 
     positions_df = pd.read_csv(path_to_save + f"positions-{identifier}.csv")
     
@@ -25,7 +24,8 @@ def compute_summary_negative_statistics(identifier, path_to_save):
         pools_dic[ticker] = item[1]
     
     summary_df = pd.DataFrame(index=pools_dic.keys(),
-                              columns=["Total margin deposited",
+                              columns=["Total notional exposure",
+                                       "Total margin deposited",
                                        "Number positions",
                                        "No. overdrafts",
                                        "Total overdrafts",
@@ -38,8 +38,10 @@ def compute_summary_negative_statistics(identifier, path_to_save):
 
     for pool in summary_df.index:
         dataset = pools_dic[pool]
+        dataset = dataset.groupby(["owneraddress","tickLower","tickUpper"]).apply(lambda x: x[x["rowLastUpdatedTimestamp"] == x["rowLastUpdatedTimestamp"].max()].iloc[0])
           
-        summary_df.loc[pool] = [dataset["Initial balance"].sum(),
+        summary_df.loc[pool] = [dataset["netNotionalLocked"].sum(),
+                                dataset["Initial balance"].sum(),
                                 len(dataset),
                                 (dataset["Real balance"]<0).sum(),
                                 (dataset["Real balance"][dataset["Real balance"]<0]).sum(),

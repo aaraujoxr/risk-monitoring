@@ -7,7 +7,7 @@ import gbq_tools
 def generate_monitoring_data(path_to_save):
     import monitoring_functions
 
-    timestampstr = datetime.now().strftime("%Y%m%d-%H%M")
+    timestampstr = datetime.now().strftime("%Y%m%d-%H%M%S")
 
     project = gbq_tools.RiskMonitoringGBQ(version="mr")
     mr_results = project.get_position_history(latest=True)
@@ -18,7 +18,7 @@ def generate_monitoring_data(path_to_save):
     pool_specs_df["inception_date"] = pool_specs_df["inception_date"].apply(lambda x: datetime.strptime(x,"%m-%d-%Y %H:%M:%S"))
 
     full_mr_table = monitoring_functions.complete_mr_table(mr_results, pool_specs_df)
-    full_mr_table.to_csv(path_to_save + f"full-mr-{timestampstr}.csv")
+    full_mr_table.drop_duplicates().to_csv(path_to_save + f"full-mr-{timestampstr}.csv")
     monitoring_functions.compute_summary_statistics(timestampstr,
                                                     pool_specs=pool_specs_df,
                                                     path_to_save=path_to_save)
@@ -31,7 +31,7 @@ def generate_monitoring_data(path_to_save):
     project = gbq_tools.GBQProjectWithKey(project_id=project_id, key_path=key_path)
 
     pnl_results = project.generic_query(pnl_query_string)
-    pnl_results.to_csv(path_to_save + f"positions-{timestampstr}.csv")
+    pnl_results.drop_duplicates().to_csv(path_to_save + f"positions-{timestampstr}.csv")
 
     solvency_statistics.compute_summary_negative_statistics(timestampstr, path_to_save=path_to_save)
 

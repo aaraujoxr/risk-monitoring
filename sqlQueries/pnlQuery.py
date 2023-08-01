@@ -3,7 +3,7 @@ pnl_query_string = """
 with pools as (
   select chainId, vamm, termEndTimestampInMS / 1000 as maturityTimestamp, rateOracle
   from `risk-monitoring-361911.voltz_v1_positions.Voltz V1 Pools Production 120623`
-  where termEndTimestampInMS / 1000  > UNIX_SECONDS(CURRENT_TIMESTAMP())
+  where termEndTimestampInMS / 1000 > UNIX_SECONDS(CURRENT_TIMESTAMP())
 ),
 
 pools_details as (
@@ -28,6 +28,7 @@ details as (
     owneraddress,
     tickLower,
     tickUpper,
+    rowLastUpdatedTimestamp,
     p.vammAddress,
     p.marginEngineAddress,
     p.chainId,
@@ -62,6 +63,7 @@ margin_table as (
 
 positions as (
   Select 
+  d.rowLastUpdatedTimestamp,
   netNotionalLocked,
   netNotionalLocked * (cutoffFixedRate - netFixedRateLocked) * (maturityTimestamp - cutoffTimestamp)/ (86400 * 365) as unrealizedPnl, 
   cashflowLiFactor * liquidityIndexCutOff + cashflowTimeFactor * cutoffTimestamp / (86400 * 365) + cashflowFreeTerm as realizedPnl,
@@ -89,6 +91,7 @@ lp_fees as (
 
 positions_with_lp_fees as (
   select 
+  p.rowLastUpdatedTimestamp,
   p.netNotionalLocked,
   p.owneraddress,
   p.tickLower,

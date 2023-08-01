@@ -33,8 +33,8 @@ def compute_summary_negative_statistics(identifier, path_to_save):
                                        "Shortfall"
                                       ])
 
-    insolvent_positions = {}
-    defaulted_positions = {}
+    # insolvent_positions = {}
+    # defaulted_positions = {}
 
     for pool in summary_df.index:
         dataset = pools_dic[pool]
@@ -48,16 +48,16 @@ def compute_summary_negative_statistics(identifier, path_to_save):
                                 (dataset["Final balance"]<0).sum(),
                                 (dataset["Final balance"][dataset["Final balance"]<0]).sum()
                                ]
-        insolvent_positions[pool] = dataset[dataset["Real balance"]<0]
+        # insolvent_positions[pool] = dataset[dataset["Real balance"]<0]
 
-        defaulted_positions[pool] = dataset[dataset["Final balance"]<0]
+        # defaulted_positions[pool] = dataset[dataset["Final balance"]<0]
 
     summary_df.to_excel(path_to_save + f"summary-{identifier}.xlsx")
 
-    with pd.ExcelWriter(path_to_save + f"overdrafts-{identifier}.xlsx") as writer:
-        for pool in insolvent_positions.keys():
-            insolvent_positions[pool].to_excel(writer, sheet_name=str(pool[1]))
+    # with pd.ExcelWriter(path_to_save + f"overdrafts-{identifier}.xlsx") as writer:
+    #     for pool in insolvent_positions.keys():
+    #         insolvent_positions[pool].to_excel(writer, sheet_name=str(pool[1]))
 
-    with pd.ExcelWriter(path_to_save + f"defaults-{identifier}.xlsx") as writer:
-        for pool in defaulted_positions.keys():
-            defaulted_positions[pool].to_excel(writer, sheet_name=str(pool[1]))
+    # with pd.ExcelWriter(path_to_save + f"defaults-{identifier}.xlsx") as writer:
+    #     for pool in defaulted_positions.keys():
+    #         defaulted_positions[pool].to_excel(writer, sheet_name=str(pool[1]))
